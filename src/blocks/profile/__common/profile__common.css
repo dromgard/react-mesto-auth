@@ -1,0 +1,10 @@
+.profile__common {
+  display: flex;
+}
+
+@media screen and (max-width: 655px) {
+  .profile__common {
+    flex-direction: column;
+    align-items: center;
+  }
+}

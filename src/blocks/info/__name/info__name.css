@@ -1,0 +1,19 @@
+.info__name {
+  overflow: hidden;
+  margin: 22px 0 8px;
+  color: #fff;
+  font-size: 42px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 48px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 655px) {
+  .info__name {
+    margin: 0 0 7px;
+    font-size: 27px;
+    line-height: 33px;
+  }
+}

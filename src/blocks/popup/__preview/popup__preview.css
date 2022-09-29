@@ -1,0 +1,7 @@
+.popup__preview {
+  position: relative;
+  display: flex;
+  max-width: 75vw;
+  max-height: 75vh;
+  flex-direction: column;
+}

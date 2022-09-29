@@ -1,0 +1,18 @@
+.info__description {
+  overflow: hidden;
+  margin: 0;
+  color: #fff;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 655px) {
+  .info__description {
+    font-size: 14px;
+    line-height: 17px;
+  }
+}

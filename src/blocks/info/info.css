@@ -1,0 +1,12 @@
+.info {
+  max-width: 294px;
+  margin-right: 18px;
+}
+
+@media screen and (max-width: 655px) {
+  .info {
+    max-width: 282px;
+    margin-right: 10px;
+    text-align: center;
+  }
+}
