@@ -5,3 +5,8 @@
   background: #ffffff;
   border-radius: 2px;
 }
+
+.sign__submit:hover {
+  cursor: pointer;
+  opacity: 0.85;
+}

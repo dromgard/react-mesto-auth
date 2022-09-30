@@ -1,8 +1,40 @@
-function Header({ children }) {
+import React from "react";
+import { Route, Switch, Link, useHistory } from "react-router-dom";
+
+function Header({ email }) {
+  const history = useHistory();
+
+  function signOut() {
+    localStorage.removeItem("jwt");
+    history.push("/sign-in");
+  }
+
   return (
     <header className="header">
       <div className="logo"></div>
-      {children}
+      <Switch>
+        <Route exact path="/">
+          <div className="header__info">
+            {email}
+            <button
+              onClick={signOut}
+              className="header__nav-link header__nav-link_exit"
+            >
+              Выйти
+            </button>
+          </div>
+        </Route>
+        <Route path="/sign-up">
+          <Link className="header__nav-link" to="sign-in">
+            Войти
+          </Link>
+        </Route>
+        <Route path="/sign-in">
+          <Link className="header__nav-link" to="sign-up">
+            Регистрация
+          </Link>
+        </Route>
+      </Switch>
     </header>
   );
 }

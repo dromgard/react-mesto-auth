@@ -11,9 +11,11 @@ import AddPlacePopup from "./AddPlacePopup";
 import Login from "./Login";
 import Register from "./Register";
 import ProtectedRoute from "./ProtectedRoute";
+import InfoTooltip from "./InfoTooltip";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { api } from "../utils/Api";
-import { Route, Switch, Redirect } from "react-router-dom";
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
+import * as auth from "../utils/auth.js";
 
 function App() {
   // Создаем состояния
@@ -22,9 +24,15 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] =
     React.useState(false);
+  const [isInfoMessagePopupOpen, setIsInfoMessagePopupOpen] =
+    React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({
     name: "",
     link: "",
+  });
+  const [resultMessage, setResultMessage] = React.useState({
+    text: "",
+    image: "",
   });
   const [cards, setCards] = React.useState([]);
 
@@ -34,11 +42,29 @@ function App() {
   // Переменная состояния для хранения статуса входа.
   const [loggedIn, setLoggedIn] = React.useState(false);
 
-  // Меняем статус логина пользователя.
-  const handleLogin = () => {
-    setLoggedIn(true);
-    console.log("handleLogin", loggedIn);
+  // Переменная состояния для хранения email залогиненного пользователя.
+  const [email, setEmail] = React.useState("");
+
+  let history = useHistory();
+
+  // Проверяем наличие токена в локальном хранилище.
+  const tokenCheck = () => {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      auth.getContent(jwt).then((res) => {
+        if (res) {
+          setEmail(res.data.email);
+          setLoggedIn(true);
+          history.push("/");
+        }
+      });
+    }
   };
+
+  // Проверка на логин при загрузке страницы.
+  React.useEffect(() => {
+    tokenCheck();
+  }, []);
 
   // Получение и запись в стейты данных текущего пользователя и карточек.
   React.useEffect(() => {
@@ -50,13 +76,14 @@ function App() {
       .catch((err) => {
         console.log(`Ошибка загрузки данных с сервера: ${err}`);
       });
-  }, []);
+  }, [email]);
 
   // Закрываем все попапы.
   const closeAllPopups = () => {
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
+    setIsInfoMessagePopupOpen(false);
     setSelectedCard({ name: "", link: "" });
   };
 
@@ -130,10 +157,20 @@ function App() {
       });
   }
 
+  // Меняем статус логина пользователя.
+  const handleLogin = () => {
+    setLoggedIn(true);
+  };
+
+  // Открываем попап статуса.
+  const handleInfoMessage = () => {
+    setIsInfoMessagePopupOpen(true);
+  };
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header />
+        <Header email={email} />
 
         <Switch>
           <ProtectedRoute
@@ -151,11 +188,18 @@ function App() {
           />
 
           <Route path="/sign-in">
-            <Login handleLogin={handleLogin} />
+            <Login
+              handleLogin={handleLogin}
+              onSuccess={handleInfoMessage}
+              updateMessage={setResultMessage}
+            />
           </Route>
 
           <Route path="/sign-up">
-            <Register />
+            <Register
+              onSuccess={handleInfoMessage}
+              updateMessage={setResultMessage}
+            />
           </Route>
 
           <Route>
@@ -196,6 +240,13 @@ function App() {
 
         {/* Попап превью изображения элемента */}
         <ImagePopup onClose={closeAllPopups} card={selectedCard} />
+
+        {/* Попап информационного сообщения */}
+        <InfoTooltip
+          isOpen={isInfoMessagePopupOpen}
+          onClose={closeAllPopups}
+          resultMessage={resultMessage}
+        />
       </div>
     </CurrentUserContext.Provider>
   );

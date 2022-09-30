@@ -1,7 +1,7 @@
 import React from "react";
-import Header from "./Header";
-import { Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import * as auth from "../utils/auth.js";
+import authError from "../images/error.svg";
 
 class Login extends React.Component {
   constructor(props) {
@@ -35,17 +35,18 @@ class Login extends React.Component {
           });
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        this.props.onSuccess();
+        this.props.updateMessage({
+          text: "Что-то пошло не так! Попробуйте ещё раз.",
+          image: authError,
+        });
+        console.log(err);
+      });
   }
   render() {
     return (
       <>
-        <Header>
-          <Link to="/sign-up" className="header__nav-link">
-            Регистрация
-          </Link>
-        </Header>
-
         <section className="sign">
           <form
             name="login"
