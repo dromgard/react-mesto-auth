@@ -1,7 +1,5 @@
 import React from "react";
 import { Link, withRouter } from "react-router-dom";
-import * as auth from "../utils/auth.js";
-import regSuccess from "../images/success.svg";
 
 class Register extends React.Component {
   constructor(props) {
@@ -25,32 +23,7 @@ class Register extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    const { password, email } = this.state;
-    auth
-      .register(password, email)
-      .then((res) => {
-        if (res) {
-          this.setState(
-            {
-              message: "",
-            },
-            () => {
-              this.props.history.push("/sign-in");
-            }
-          );
-        } else {
-          this.setState({
-            message: "Что-то пошло не так!",
-          });
-        }
-      })
-      .finally(() => {
-        this.props.onSuccess();
-        this.props.updateMessage({
-          text: "Вы успешно зарегистрировались!",
-          image: regSuccess,
-        });
-      });
+    this.props.handleRegister(this.state.email, this.state.password);
   }
 
   render() {

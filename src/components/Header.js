@@ -1,14 +1,7 @@
 import React from "react";
-import { Route, Switch, Link, useHistory } from "react-router-dom";
+import { Route, Switch, Link } from "react-router-dom";
 
-function Header({ email }) {
-  const history = useHistory();
-
-  function signOut() {
-    localStorage.removeItem("jwt");
-    history.push("/sign-in");
-  }
-
+function Header({ email, handleLogout }) {
   return (
     <header className="header">
       <div className="logo"></div>
@@ -17,7 +10,7 @@ function Header({ email }) {
           <div className="header__info">
             {email}
             <button
-              onClick={signOut}
+              onClick={handleLogout}
               className="header__nav-link header__nav-link_exit"
             >
               Выйти

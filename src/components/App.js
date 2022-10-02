@@ -16,6 +16,8 @@ import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { api } from "../utils/Api";
 import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 import * as auth from "../utils/auth.js";
+import authError from "../images/error.svg";
+import regSuccess from "../images/success.svg";
 
 function App() {
   // Создаем состояния
@@ -51,20 +53,26 @@ function App() {
   const tokenCheck = () => {
     const jwt = localStorage.getItem("jwt");
     if (jwt) {
-      auth.getContent(jwt).then((res) => {
-        if (res) {
-          setEmail(res.data.email);
-          setLoggedIn(true);
-          history.push("/");
-        }
-      });
+      auth
+        .getContent(jwt)
+        .then((res) => {
+          if (res) {
+            setEmail(res.data.email);
+            setLoggedIn(true);
+            history.push("/");
+          }
+        })
+        .catch((err) => {
+          setLoggedIn(false);
+          console.log(`Переданный токен некорректен: ${err}`);
+        });
     }
   };
 
   // Проверка на логин при загрузке страницы.
   React.useEffect(() => {
     tokenCheck();
-  }, []);
+  }, [loggedIn]);
 
   // Получение и запись в стейты данных текущего пользователя и карточек.
   React.useEffect(() => {
@@ -76,7 +84,7 @@ function App() {
       .catch((err) => {
         console.log(`Ошибка загрузки данных с сервера: ${err}`);
       });
-  }, [email]);
+  }, []);
 
   // Закрываем все попапы.
   const closeAllPopups = () => {
@@ -93,11 +101,11 @@ function App() {
       .editUserInfo(name, about)
       .then((userData) => {
         setCurrentUser(userData);
+        closeAllPopups();
       })
       .catch((err) => {
         console.log(`Ошибка обновления данных пользователя: ${err}`);
-      })
-      .finally(() => closeAllPopups());
+      });
   }
 
   // Обработчик сохранения аватара пользователя.
@@ -106,11 +114,11 @@ function App() {
       .updateUserAvatar(avatar)
       .then((userData) => {
         setCurrentUser(userData);
+        closeAllPopups();
       })
       .catch((err) => {
         console.log(`Ошибка обновления аватара: ${err}`);
-      })
-      .finally(() => closeAllPopups());
+      });
   }
 
   // Обработчик добавления новой карточки.
@@ -119,11 +127,11 @@ function App() {
       .addNewCard(name, link)
       .then((newCard) => {
         setCards([newCard, ...cards]);
+        closeAllPopups();
       })
       .catch((err) => {
         console.log(`Ошибка добавления новой карточки: ${err}`);
-      })
-      .finally(() => closeAllPopups());
+      });
   }
 
   // Обработчик лайков
@@ -157,9 +165,53 @@ function App() {
       });
   }
 
-  // Меняем статус логина пользователя.
-  const handleLogin = () => {
-    setLoggedIn(true);
+  // Обработчик логина.
+  const handleLogin = (userEmail, userPassword, resetLoginForm) => {
+    if (!userEmail || !userPassword) {
+      return;
+    }
+    auth
+      .authorize(userEmail, userPassword)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem("jwt", data.token);
+          setLoggedIn(true);
+          history.push("/home");
+          resetLoginForm();
+        }
+      })
+      .catch((err) => {
+        setResultMessage({
+          text: "Что-то пошло не так! Попробуйте ещё раз.",
+          image: authError,
+        });
+        setIsInfoMessagePopupOpen(true);
+        console.log(err);
+      });
+  };
+
+  // Обработчик регистрации.
+  const handleRegister = (userEmail, userPassword) => {
+    auth
+      .register(userPassword, userEmail)
+      .then((res) => {
+        setResultMessage({
+          text: "Вы успешно зарегистрировались!",
+          image: regSuccess,
+        });
+        history.push("/sign-in");
+        console.log("Успех регистрации", res);
+      })
+      .catch((err) => {
+        setResultMessage({
+          text: "Что-то пошло не так!",
+          image: authError,
+        });
+        console.log("Ошибка регистрации", err);
+      })
+      .finally(() => {
+        setIsInfoMessagePopupOpen(true);
+      });
   };
 
   // Открываем попап статуса.
@@ -167,10 +219,17 @@ function App() {
     setIsInfoMessagePopupOpen(true);
   };
 
+  // Обрабатываем выход из аккаунта.
+  const handleLogout = () => {
+    localStorage.removeItem("jwt");
+    history.push("/sign-in");
+    setLoggedIn(false);
+  };
+
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
-        <Header email={email} />
+        <Header email={email} handleLogout={handleLogout} />
 
         <Switch>
           <ProtectedRoute
@@ -188,15 +247,12 @@ function App() {
           />
 
           <Route path="/sign-in">
-            <Login
-              handleLogin={handleLogin}
-              onSuccess={handleInfoMessage}
-              updateMessage={setResultMessage}
-            />
+            <Login handleLogin={handleLogin} />
           </Route>
 
           <Route path="/sign-up">
             <Register
+              handleRegister={handleRegister}
               onSuccess={handleInfoMessage}
               updateMessage={setResultMessage}
             />
