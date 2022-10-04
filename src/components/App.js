@@ -8,6 +8,7 @@ import ImagePopup from "./ImagePopup";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
+import ConfirmDeleteCard from "./ConfirmDeleteCard";
 import Login from "./Login";
 import Register from "./Register";
 import ProtectedRoute from "./ProtectedRoute";
@@ -28,10 +29,13 @@ function App() {
     React.useState(false);
   const [isInfoMessagePopupOpen, setIsInfoMessagePopupOpen] =
     React.useState(false);
+  const [isConfirmDeletePopupOpen, setIsConfirmDeletePopupOpen] =
+    React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({
     name: "",
     link: "",
   });
+  const [cardToDelete, setCardToDelete] = React.useState({});
   const [resultMessage, setResultMessage] = React.useState({
     text: "",
     image: "",
@@ -92,7 +96,9 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsInfoMessagePopupOpen(false);
+    setIsConfirmDeletePopupOpen(false);
     setSelectedCard({ name: "", link: "" });
+    setCardToDelete({});
   };
 
   // Обработчик сохранения данных пользователя.
@@ -152,13 +158,21 @@ function App() {
       });
   }
 
+  // Обработчик нажатия на кнопку удаления карточки. Открывает попап, записывает в стэйт карточку для удаления.
+  function handleDeleteClick(card) {
+    setIsConfirmDeletePopupOpen(true);
+    setCardToDelete(card);
+  }
+
   // Обработчик удаления карточки.
-  function handleCardDelete(card) {
+  function handleCardDelete() {
     // Отправляем запрос в API и получаем обновлённые данные карточки.
     api
-      .deleteCard(card._id)
+      .deleteCard(cardToDelete._id)
       .then((deleteCard) => {
-        setCards((state) => state.filter((c) => c._id !== card._id));
+        setCards((state) => state.filter((c) => c._id !== cardToDelete._id));
+        setIsConfirmDeletePopupOpen(false);
+        setCardToDelete({});
       })
       .catch((err) => {
         console.log(`Ошибка удаления карточки: ${err}`);
@@ -243,7 +257,7 @@ function App() {
             onCardClick={setSelectedCard}
             cards={cards}
             onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
+            onCardDelete={handleDeleteClick}
           />
 
           <Route path="/sign-in">
@@ -292,6 +306,13 @@ function App() {
           isOpen={isEditAvatarPopupOpen}
           onClose={closeAllPopups}
           onUpdateAvatar={handleUpdateAvatar}
+        />
+
+        {/* Попап подтверждения удаления */}
+        <ConfirmDeleteCard
+          isOpen={isConfirmDeletePopupOpen}
+          onClose={closeAllPopups}
+          onCardDelete={handleCardDelete}
         />
 
         {/* Попап превью изображения элемента */}
