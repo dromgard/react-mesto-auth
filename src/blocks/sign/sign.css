@@ -4,3 +4,9 @@
   max-width: 358px;
   display: flex;
 }
+
+@media screen and (max-width: 420px) {
+  .sign {
+    margin: 0 30px;
+  }
+}
