@@ -238,6 +238,7 @@ function App() {
     localStorage.removeItem("jwt");
     history.push("/sign-in");
     setLoggedIn(false);
+    setEmail("");
   };
 
   return (

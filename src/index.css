@@ -8,11 +8,23 @@
 
 @import url("../src/blocks/header/header.css");
 
-@import url("../src/blocks/header/nav-link/header__nav-link.css");
+@import url("../src/blocks/header/__common/header__common.css");
 
-@import url("../src/blocks/header/nav-link/_exit/header__nav-link_exit.css");
+@import url("../src/blocks/header/__nav-link/header__nav-link.css");
+
+@import url("../src/blocks/header/__nav-link/_exit/header__nav-link_exit.css");
 
 @import url("../src/blocks/header/__info/header__info.css");
+
+@import url("../src/blocks/header/__info/_visible/header__info_visible.css");
+
+@import url("../src/blocks/header/__info/_invisible/header__info_invisible.css");
+
+@import url("../src/blocks/header/__email/header__email.css");
+
+@import url("../src/blocks/header/__burger-button/header__burger-button.css");
+
+@import url("../src/blocks/header/__burger-button/_close/header__burger-button_close.css");
 
 @import url("../src/blocks/logo/logo.css");
 

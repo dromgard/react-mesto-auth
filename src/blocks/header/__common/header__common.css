@@ -1,0 +1,12 @@
+.header__common {
+  padding: 45px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media screen and (max-width: 882px) {
+  .header__common {
+    padding: 28px 0 0;
+  }
+}

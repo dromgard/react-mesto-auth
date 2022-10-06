@@ -1,0 +1,15 @@
+.header__info_visible {
+  max-width: 880px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin: 0;
+  padding: 34px 0 40px 0;
+  border-bottom: 1px solid rgba(84 84 84 / 70%);
+}
+
+@media screen and (min-width: 501px) {
+  .header__info_visible {
+    display: none;
+  }
+}
