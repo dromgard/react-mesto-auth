@@ -70,6 +70,8 @@ function App() {
           setLoggedIn(false);
           console.log(`Переданный токен некорректен: ${err}`);
         });
+    } else {
+      navigate("/sign-in");
     }
   };
 
