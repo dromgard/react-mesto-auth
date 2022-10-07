@@ -48,7 +48,7 @@ function Header({ email, handleLogout }) {
           <Route
             path="/sign-up"
             element={
-              <Link className="header__nav-link" to="sign-in">
+              <Link className="header__nav-link" to="/sign-in">
                 Войти
               </Link>
             }
@@ -56,7 +56,7 @@ function Header({ email, handleLogout }) {
           <Route
             path="/sign-in"
             element={
-              <Link className="header__nav-link" to="sign-up">
+              <Link className="header__nav-link" to="/sign-up">
                 Регистрация
               </Link>
             }

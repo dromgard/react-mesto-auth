@@ -190,7 +190,7 @@ function App() {
         if (data.token) {
           localStorage.setItem("jwt", data.token);
           setLoggedIn(true);
-          navigate("/home");
+          navigate("/");
           resetLoginForm();
         }
       })
@@ -248,6 +248,7 @@ function App() {
 
         <Routes>
           <Route
+            exact
             path="/"
             element={
               <ProtectedRoute loggedIn={loggedIn}>
@@ -282,11 +283,7 @@ function App() {
 
           <Route
             element={
-              loggedIn ? (
-                <Navigate to="/" replace />
-              ) : (
-                <Navigate to="/sign-in" replace />
-              )
+              loggedIn ? <Navigate to="/" /> : <Navigate to="/sign-in" />
             }
           ></Route>
         </Routes>
