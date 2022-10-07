@@ -15,7 +15,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import InfoTooltip from "./InfoTooltip";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import { api } from "../utils/Api";
-import { Route, Switch, Redirect, useHistory } from "react-router-dom";
+import { Route, Routes, useNavigate, Navigate } from "react-router-dom";
 import * as auth from "../utils/auth.js";
 import authError from "../images/error.svg";
 import regSuccess from "../images/success.svg";
@@ -51,7 +51,7 @@ function App() {
   // Переменная состояния для хранения email залогиненного пользователя.
   const [email, setEmail] = React.useState("");
 
-  let history = useHistory();
+  let navigate = useNavigate();
 
   // Проверяем наличие токена в локальном хранилище.
   const tokenCheck = () => {
@@ -63,7 +63,7 @@ function App() {
           if (res) {
             setEmail(res.data.email);
             setLoggedIn(true);
-            history.push("/");
+            navigate("/");
           }
         })
         .catch((err) => {
@@ -190,7 +190,7 @@ function App() {
         if (data.token) {
           localStorage.setItem("jwt", data.token);
           setLoggedIn(true);
-          history.push("/home");
+          navigate("/home");
           resetLoginForm();
         }
       })
@@ -213,7 +213,7 @@ function App() {
           text: "Вы успешно зарегистрировались!",
           image: regSuccess,
         });
-        history.push("/sign-in");
+        navigate("/sign-in");
         console.log("Успех регистрации", res);
       })
       .catch((err) => {
@@ -236,7 +236,7 @@ function App() {
   // Обрабатываем выход из аккаунта.
   const handleLogout = () => {
     localStorage.removeItem("jwt");
-    history.push("/sign-in");
+    navigate("/sign-in");
     setLoggedIn(false);
     setEmail("");
   };
@@ -246,37 +246,50 @@ function App() {
       <div className="page">
         <Header email={email} handleLogout={handleLogout} />
 
-        <Switch>
-          <ProtectedRoute
-            exact
+        <Routes>
+          <Route
             path="/"
-            loggedIn={loggedIn}
-            component={Main}
-            onEditProfile={setIsEditProfilePopupOpen}
-            onAddPlace={setIsAddPlacePopupOpen}
-            onEditAvatar={setIsEditAvatarPopupOpen}
-            onCardClick={setSelectedCard}
-            cards={cards}
-            onCardLike={handleCardLike}
-            onCardDelete={handleDeleteClick}
-          />
+            element={
+              <ProtectedRoute loggedIn={loggedIn}>
+                <Main
+                  onEditProfile={setIsEditProfilePopupOpen}
+                  onAddPlace={setIsAddPlacePopupOpen}
+                  onEditAvatar={setIsEditAvatarPopupOpen}
+                  onCardClick={setSelectedCard}
+                  cards={cards}
+                  onCardLike={handleCardLike}
+                  onCardDelete={handleDeleteClick}
+                />
+              </ProtectedRoute>
+            }
+          ></Route>
 
-          <Route path="/sign-in">
-            <Login handleLogin={handleLogin} />
-          </Route>
+          <Route
+            path="/sign-in"
+            element={<Login handleLogin={handleLogin} />}
+          ></Route>
 
-          <Route path="/sign-up">
-            <Register
-              handleRegister={handleRegister}
-              onSuccess={handleInfoMessage}
-              updateMessage={setResultMessage}
-            />
-          </Route>
+          <Route
+            path="/sign-up"
+            element={
+              <Register
+                handleRegister={handleRegister}
+                onSuccess={handleInfoMessage}
+                updateMessage={setResultMessage}
+              />
+            }
+          ></Route>
 
-          <Route>
-            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
-          </Route>
-        </Switch>
+          <Route
+            element={
+              loggedIn ? (
+                <Navigate to="/" replace />
+              ) : (
+                <Navigate to="/sign-in" replace />
+              )
+            }
+          ></Route>
+        </Routes>
 
         <Footer />
 

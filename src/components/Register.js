@@ -80,4 +80,4 @@ class Register extends React.Component {
   }
 }
 
-export default withRouter(Register);
+export default Register;
